@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-06",
+  "artifact": "stillwander-neoforge-1.1.0-alpha.1+1.21.1.jar",
+  "sha256": "bf0d02dea43e64a252241c94f5e36e8552d7caefc12ebe23c796cdc45420b78e",
+  "cleanBuild": "PASS",
+  "command": ".\\gradlew.bat -p source/1.21.1 clean test build --no-build-cache --no-daemon --console=plain",
+  "gradleTaskExecution": "10 actionable tasks: 10 executed",
+  "minecraftArtifactPreparation": "NeoForm intermediate cache reused",
+  "junit": {
+    "tests": 38,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "smokeChecks": {
+    "none": 14,
+    "full": 28
+  },
+  "seatedRegressionBeforeFix": "FAIL: actual look vector differs from world focus",
+  "seatedRegressionAfterFix": "PASS at partial ticks 0.25, 0.5, 1.0; ordinary seated view restored",
+  "releaseAndSourceJarsExcludeSmokeFixtures": true
+}

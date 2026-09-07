@@ -6,16 +6,18 @@
 
 <p align="center">
   <strong>When you stop exploring, Still Wander doesn't.</strong><br>
-  A cinematic AFK camera mod for Minecraft Fabric.
+  A cinematic AFK camera mod, ported to Minecraft 1.21.1 NeoForge.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/loader-Fabric-d8c49a?style=flat-square" alt="Fabric Loader">
+  <img src="https://img.shields.io/badge/loader-NeoForge-d8c49a?style=flat-square" alt="NeoForge">
   <img src="https://img.shields.io/badge/environment-client--side-39b8c8?style=flat-square" alt="Client-side">
-  <img src="https://img.shields.io/badge/Minecraft-10%20supported%20versions-d49a43?style=flat-square" alt="Ten supported Minecraft versions">
+  <img src="https://img.shields.io/badge/Minecraft-1.21.1-d49a43?style=flat-square" alt="Minecraft 1.21.1">
 </p>
 
 Still Wander turns idle moments into a slow, cinematic journey through the world around you. Its environment-aware camera chooses varied player, landscape, cave, structure, and entity compositions, then moves between them with smooth pans, deliberate pacing, and independent cinematic FOV.
+
+This fork ports the upstream 1.1 alpha source to NeoForge 1.21.1. It includes direct support for Sable/Create Aeronautics.
 
 - **Scene-aware direction** adapts shots to open landscapes, forests, interiors, caves, weather, time, nearby entities, and terrain.
 - **Cinematic movement** blends slow pans, tracking shots, wide establishing views, intimate details, and occasional static compositions.
@@ -43,29 +45,17 @@ Still Wander turns idle moments into a slow, cinematic journey through the world
 
 ## Downloads and compatibility
 
-Choose the JAR that exactly matches your Minecraft version.
+Prebuilt downloads are not provided for this port. Download the JAR from a successful [GitHub Actions](#build-with-github-actions) run, or [build locally](#build-locally). The port targets Minecraft 1.21.1 and NeoForge 21.1.250 with Java 21.
 
-| Minecraft | Java | Built against Fabric API | Download | Verification |
-| --- | --- | --- | --- | --- |
-| 1.20.1 | 17+ | 0.92.11+1.20.1 | [Download](versions/stillwander-1.0.0+1.20.1.jar) | Build and static compatibility checks |
-| 1.20.4 | 17+ | 0.97.3+1.20.4 | [Download](versions/stillwander-1.0.0+1.20.4.jar) | Build and static compatibility checks |
-| 1.21.1 | 21+ | 0.116.15+1.21.1 | [Download](versions/stillwander-1.0.0+1.21.1.jar) | Build and static compatibility checks |
-| 1.21.4 | 21+ | 0.119.4+1.21.4 | [Download](versions/stillwander-1.0.0+1.21.4.jar) | Build and static compatibility checks |
-| 1.21.8 | 21+ | 0.136.1+1.21.8 | [Download](versions/stillwander-1.0.0+1.21.8.jar) | Build and static compatibility checks |
-| 1.21.11 | 21+ | 0.141.6+1.21.11 | [Download](versions/stillwander-1.0.0+1.21.11.jar) | In-game tested |
-| 26.1 | 25+ | 0.145.1+26.1 | [Download](versions/stillwander-1.0.0+26.1.jar) | Build and static compatibility checks |
-| 26.1.1 | 25+ | 0.145.4+26.1.1 | [Download](versions/stillwander-1.0.0+26.1.1.jar) | Build and static compatibility checks |
-| 26.1.2 | 25+ | 0.155.2+26.1.2 | [Download](versions/stillwander-1.0.0+26.1.2.jar) | Build and static compatibility checks |
-| 26.2 | 25+ | 0.158.0+26.2 | [Download](versions/stillwander-1.0.0+26.2.jar) | Build and static compatibility checks |
+Built-in integrations support **Freecam, Dynamic FPS, ReForgedPlay, Sable, and Iris**. Sable Companion 1.6.0 is bundled. See [COMPATIBILITY.md](COMPATIBILITY.md) for integration behavior, tested versions, and remaining checks.
 
-All builds require Fabric Loader 0.19.3 or newer and Fabric API for the same Minecraft version. The Fabric API versions above are the versions used to build each JAR; a newer compatible Fabric API release for that same Minecraft version may also work.
+The original Fabric release is available from [upstream Still Wander 1.0.0](https://github.com/Prasanna163/StillWander/releases/tag/v1.0.0).
 
 ## Install
 
-1. Install Fabric Loader for your Minecraft version.
-2. Install Fabric API for that same Minecraft version.
-3. Download the matching Still Wander JAR and place it in the Minecraft `mods` folder.
-4. Start Minecraft and enter a world.
+1. Set up a Minecraft **1.21.1** client instance with **NeoForge**. NeoForge **21.1.250** is the tested version.
+2. Obtain the mod JAR using [GitHub Actions](#build-with-github-actions) or [Build locally](#build-locally) below.
+3. Copy `stillwander-neoforge-1.1.0-alpha.1+1.21.1.jar` into your instance's `mods/` folder.
 
 ## Controls
 
@@ -75,10 +65,13 @@ All builds require Fabric Loader 0.19.3 or newer and Fabric API for the same Min
 | Cut to the next shot | `N` |
 | Open Still Wander settings | `F7` |
 | Toggle uninterrupted capture mode | `F8` |
+| Toggle director debug overlay | `F9` |
 | Start automatically | Remain idle for 25 seconds |
 | Exit normal cinematic mode | Move, interact, or take damage |
 
 Keys can be changed from Minecraft's **Options > Controls > Key Binds** screen.
+
+Still Wander yields to Freecam and replay viewing, including capture mode. Closing either starts a fresh idle countdown. ReForgedPlay recording during ordinary gameplay does not block cinematics. Still Wander never writes replay timelines or keyframes.
 
 ### Capturing footage and screenshots
 
@@ -88,29 +81,46 @@ For a session that also continues when the player takes damage, press `F7` first
 
 Still Wander controls the cinematic camera; it does not encode an MP4 video itself. Use recording software such as OBS Studio, Xbox Game Bar, or another capture tool for video.
 
-## Source and build
+## Source
 
-The actual Still Wander client source is public in [`source/1.21.11`](source/1.21.11). The [`v1.0.0`](https://github.com/Prasanna163/StillWander/tree/v1.0.0) tag preserves the authored implementation that reproduces the published 1.0.0 JAR. The current source tree may contain clearly versioned development work for the next release; its exact version is declared in `source/1.21.11/gradle.properties`.
+The NeoForge client source is in [`source/1.21.1`](source/1.21.1). Its version is declared in `source/1.21.1/gradle.properties`. The upstream [`v1.0.0`](https://github.com/Prasanna163/StillWander/tree/v1.0.0) tag preserves the authored Fabric implementation that reproduces the published 1.0.0 JAR.
 
 The internal Java package and several class names still use `com.cinecraft`, the project's original working-title namespace. They are retained deliberately for binary traceability; the installed mod ID, resources, configuration, controls, and user-facing name are `stillwander` / Still Wander.
 
-To build the current Minecraft 1.21.11 source on Windows:
+## Build
+
+### Build with GitHub Actions
+
+The manual [Build mod JAR workflow](.github/workflows/build-mod.yml) compiles the NeoForge port, runs its automated tests, and uploads the installable JAR on success. No local build tools are needed.
+
+1. Open a GitHub repository containing this port where you have write access, such as your own fork. Open **Actions** and enable the workflow if prompted.
+2. Select **Build mod JAR** in the workflow list.
+3. Click **Run workflow**, select the branch **1.21.1-Neoforge**, and click **Run workflow** again.
+4. Open the new run, select the **build** job, and expand **Run tests and build Still Wander** to view the build output. A successful run finishes with a green check and `BUILD SUCCESSFUL` in that step's log.
+5. Once **Upload installable mod JAR** succeeds, return to the run's summary page. Under **Artifacts**, click the mod JAR artifact, currently `stillwander-neoforge-1.1.0-alpha.1+1.21.1.jar`, to download it.
+
+Manual runs require `.github/workflows/build-mod.yml`, including its `workflow_dispatch` trigger, to be present on the repository's default branch. If **Run workflow** is missing, check that requirement and your write access. See [GitHub's manual workflow instructions](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow).
+
+Artifacts are retained for 30 days, subject to repository retention limits or earlier deletion. If an artifact has expired, start a new run. The upload contains only the installable mod JAR; sources are excluded. In-game smoke tests and visual compatibility checks remain separate; see [COMPATIBILITY.md](COMPATIBILITY.md).
+
+### Build locally
+
+Requires Java 21 **JDK**. Clone this repository, or download and extract its source ZIP using **Code > Download ZIP**. Open a terminal in the repository root and run this command:
+
+On Windows (PowerShell):
 
 ```powershell
-.\gradlew.bat -p source\1.21.11 clean build
+.\gradlew.bat -p source/1.21.1 build
 ```
 
 On Linux or macOS:
 
 ```bash
-./gradlew -p source/1.21.11 clean build
+chmod +x ./gradlew
+./gradlew -p source/1.21.1 build
 ```
 
-The distributable JAR is written to `source/1.21.11/build/libs`. The build requires a Java 21 **JDK** (not only a JRE) and downloads the declared Minecraft, Yarn, Fabric Loader, Fabric API, and Fabric Loom dependencies on first use. It does not need to launch Minecraft. Development builds also run the automated quality suite described in [`source/1.21.11/QUALITY.md`](source/1.21.11/QUALITY.md).
-
-This source tree targets 1.21.11. The other downloads in `versions/` are mapping/API compatibility ports of the same Still Wander 1.0 behavior; this repository does not claim that those version-specific JARs can be rebuilt unchanged from the 1.21.11 project.
-
-The full development timeline, binary verification, relationship to IDLE, and AI disclosure are documented in [PROVENANCE.md](PROVENANCE.md).
+Wait for `BUILD SUCCESSFUL`, then find the installable JAR in `source/1.21.1/build/libs/`. The build downloads the declared dependencies on first use, so an internet connection is required.
 
 ## License
 

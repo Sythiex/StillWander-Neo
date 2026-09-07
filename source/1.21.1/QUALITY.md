@@ -1,0 +1,47 @@
+# Still Wander quality gates
+
+This file defines the development contract for the 1.21.1 NeoForge port of the cinematic director. A feature is not complete merely because it compiles. Current implementation and qualification results are recorded in [PORTING.md](../../PORTING.md) and [COMPATIBILITY.md](../../COMPATIBILITY.md).
+
+## Automated gate
+
+Run from the repository root:
+
+```powershell
+.\gradlew.bat -p source/1.21.1 clean test build --no-daemon --console=plain
+```
+
+The automated suite covers deterministic continuity rules, bounded state, camera-path invariants, diagnostic traces, and the scene-fixture catalogue. It also checks every configured mixin's injection signatures and shadow members against the pinned Minecraft/NeoForge bytecode without launching Minecraft. The automatic [Test workflow](../../.github/workflows/build-and-test.yml) runs `clean test` on every relevant push and pull request, compiling and testing without packaging mod JARs. The manual [Build mod JAR workflow](../../.github/workflows/build-mod.yml) runs `clean build`, which includes those tests, and uploads the installable JAR only after success. Archived Fabric published-JAR parity is a separate manual workflow using the upstream `v1.0.0` tag.
+
+## Safety invariants
+
+- Collision and visibility validation remains authoritative over editorial scoring.
+- Camera and focus samples must be finite.
+- FOV tracks must remain inside the planner's supported range.
+- Damage, activity, manual controls, HUD restoration, and Dynamic FPS request/release semantics must not be changed by director work. Camera handoff must release capture and FPS requests, respect observed external HUD changes, and restart idle time. Synchronous FPS release observers must see all cinematic state cleared; test the resulting Dynamic FPS power state, not only its bypass query.
+- Replay playback, pause, seeking, editing, and export must never acquire Still Wander camera/control ownership. Ordinary recording is eligible. No replay files, packets, or timelines may be changed by the mod.
+- Ship camera rigs retain local offsets across logical and render poses. Cinematic angles are world-space: the final camera quaternion, direction vectors, and Euler angles must face the planned focus without inheriting a mounted seat's ship rotation again. Verify the transformed camera with an actually seated player on a rotated ship, and verify ordinary camera behavior resumes after ownership ends. Missing ship geometry or non-finite positions must fail closed, and moving obstacles invalidate previously safe poses. Collision and raycast candidates must include the sampled rendered hull even when translation or intermediate rotation places it outside logical bounds and fixed padding.
+- The scanner must inspect loaded world state only and must not mutate the world.
+- The existing planner remains the fallback when no continuity-aware candidate is safe.
+
+## Fixed visual matrix
+
+Milestone builds are reviewed in these environments before release:
+
+1. Open plains or desert
+2. Dense forest
+3. Small interior
+4. Cave
+5. Ocean or coast
+6. Village or player build
+7. Nether
+8. Moving nearby entity
+
+For each environment, review smoothness, composition, continuity, variety, collision safety, FOV changes, and subject tracking. Visual review is a milestone gate; ordinary code changes use automated validation and do not require launching Minecraft.
+
+## Performance baseline
+
+The opt-in debug overlay reports scene-survey and shot-planning time in microseconds. The director also retains the latest 32 accepted `ShotTrace` records for diagnostic integrations. Compare median and worst observed values over a fifteen-minute session with the last accepted milestone. A regression must be investigated before release; raising scan or candidate budgets requires its own reviewed change.
+
+## Phase 1 continuity contract
+
+Continuity is a soft scoring layer. It may reward an adjacent scale change or a short subject continuation and penalize repeated scale, repeated orbit, large lens jumps, uncontrolled action-axis crossings, and overused subjects. It may never approve a candidate rejected by collision, visibility, or framing checks.

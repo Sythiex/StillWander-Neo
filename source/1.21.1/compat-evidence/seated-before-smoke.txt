@@ -1,0 +1,10 @@
+PASS normal gameplay eligible (including ordinary replay recording)
+PASS player tracked aboard assembled Sable ship
+PASS cinematic activation
+PASS cinematic hides HUD
+PASS rendering requested
+PASS finite rendered camera
+PASS moving and fast rendered ship hull collision, raycast projection, and interpolated rig
+PASS Dynamic FPS bypass applied
+PASS Dynamic FPS returns to UNFOCUSED immediately after activity shutdown
+FAILED java.lang.AssertionError: seated cinematic look vector: expected (-0.8103007710182366, -0.35856853088957114, -0.4635097292861782), got (-0.9211103916168213, -0.3585682511329651, -0.15160632133483887)

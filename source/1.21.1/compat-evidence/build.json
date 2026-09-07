@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-06",
+  "artifact": "stillwander-neoforge-1.1.0-alpha.1+1.21.1.jar",
+  "sha256": "14e0e08e0079cfd8ae1e110ddc176e9c3af0f4904d925096073da9d12b34808b",
+  "cleanBuild": "PASS",
+  "junit": {
+    "tests": 33,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "smokeChecks": {
+    "none": 14,
+    "camera": 18,
+    "full": 25
+  },
+  "releaseAndSourceJarsExcludeSmokeFixtures": true
+}

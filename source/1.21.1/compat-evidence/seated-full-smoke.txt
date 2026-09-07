@@ -1,0 +1,29 @@
+PASS normal gameplay eligible (including ordinary replay recording)
+PASS player tracked aboard assembled Sable ship
+PASS cinematic activation
+PASS cinematic hides HUD
+PASS rendering requested
+PASS finite rendered camera
+PASS moving and fast rendered ship hull collision, raycast projection, and interpolated rig
+PASS Dynamic FPS bypass applied
+PASS Dynamic FPS returns to UNFOCUSED immediately after activity shutdown
+PASS seated rotated ship camera faces world focus at three partial ticks and restores ordinary view
+PASS standalone capture starts
+PASS Freecam owns camera
+PASS camera and capture released
+PASS HUD restored
+PASS rendering request released
+PASS Dynamic FPS bypass released
+PASS controls inert during Freecam
+PASS gameplay eligibility restored
+PASS fresh idle countdown
+PASS cinematic can restart after handoff
+PASS Dynamic FPS returns to INVISIBLE immediately after failed-shot shutdown
+PASS external HUD change preserved
+PASS logout cleanup
+PASS replay session blocks cinematics immediately
+PASS replay playback ignores controls and capture/FPS requests
+PASS paused replay retains camera ownership
+PASS replay seeking retains camera ownership
+PASS replay close leaves no cinematic state
+SUCCESS

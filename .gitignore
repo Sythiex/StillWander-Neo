@@ -2,6 +2,9 @@
 /build/
 /logs/
 /run/
+**/run/
+**/run-smoke/
+**/run-compat/
 /Video/
 /src/
 

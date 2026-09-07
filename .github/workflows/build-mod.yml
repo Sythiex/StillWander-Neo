@@ -1,27 +1,13 @@
-name: Build and test
+name: Build mod JAR
 
 on:
-  push:
-    paths:
-      - '.github/workflows/**'
-      - 'gradle/**'
-      - 'gradlew'
-      - 'gradlew.bat'
-      - 'source/1.21.1/**'
-  pull_request:
-    paths:
-      - '.github/workflows/**'
-      - 'gradle/**'
-      - 'gradlew'
-      - 'gradlew.bat'
-      - 'source/1.21.1/**'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -38,4 +24,14 @@ jobs:
         run: |
           set -euo pipefail
           chmod +x ./gradlew
-          ./gradlew -p source/1.21.1 clean test build --no-daemon --console=plain
+          ./gradlew -p source/1.21.1 clean build --no-daemon --console=plain
+
+      - name: Upload installable mod JAR
+        uses: actions/upload-artifact@v7
+        with:
+          path: |
+            source/1.21.1/build/libs/stillwander-neoforge-*.jar
+            !source/1.21.1/build/libs/*-sources.jar
+          archive: false
+          if-no-files-found: error
+          retention-days: 30

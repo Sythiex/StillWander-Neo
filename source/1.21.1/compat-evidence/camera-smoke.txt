@@ -1,0 +1,19 @@
+PASS normal gameplay eligible (including ordinary replay recording)
+PASS cinematic activation
+PASS cinematic hides HUD
+PASS rendering requested
+PASS finite rendered camera
+PASS Dynamic FPS bypass applied
+PASS standalone capture starts
+PASS Freecam owns camera
+PASS camera and capture released
+PASS HUD restored
+PASS rendering request released
+PASS Dynamic FPS bypass released
+PASS controls inert during Freecam
+PASS gameplay eligibility restored
+PASS fresh idle countdown
+PASS cinematic can restart after handoff
+PASS external HUD change preserved
+PASS logout cleanup
+SUCCESS

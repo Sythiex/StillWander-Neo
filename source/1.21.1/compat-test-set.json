@@ -1,0 +1,73 @@
+{
+  "recorded": "2026-09-06",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.250",
+  "java": "21",
+  "sableCompanion": "1.6.0",
+  "mods": [
+    {
+      "project": "freecam",
+      "version": "1.3.0+mc1.21.1",
+      "artifact": "maven.modrinth:freecam:ROfcbxxe",
+      "filename": "freecam-neoforge-1.3.0+mc1.21.jar",
+      "url": "https://cdn.modrinth.com/data/XeEZ3fK2/versions/ROfcbxxe/freecam-neoforge-1.3.0%2Bmc1.21.jar",
+      "sha512": "06cfa2acdde8320ca19edf3f49e7a3860cc079bbad02fda493459109d745da237e19ff6a28d879d4c863ea4cd24d83b193ec82dd351540ad27991e239f1e7a72"
+    },
+    {
+      "project": "dynamic-fps",
+      "version": "3.11.4",
+      "artifact": "maven.modrinth:dynamic-fps:T238FZpQ",
+      "filename": "dynamic-fps-3.11.4+minecraft-1.21.0-neoforge.jar",
+      "url": "https://cdn.modrinth.com/data/LQ3K71Q1/versions/T238FZpQ/dynamic-fps-3.11.4%2Bminecraft-1.21.0-neoforge.jar",
+      "sha512": "8eb18a280b265e598540306275b51a165836f4b14c6c703b6ced11fcac50bfab439e4deb69e222f62614a9f15fa0ef58e5bd84e20e37ae57755d9c2f8b134057"
+    },
+    {
+      "project": "sodium",
+      "version": "mc1.21.1-0.8.13-neoforge",
+      "artifact": "maven.modrinth:sodium:uMOpc5uV",
+      "filename": "sodium-neoforge-0.8.13+mc1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/AANobbMI/versions/uMOpc5uV/sodium-neoforge-0.8.13%2Bmc1.21.1.jar",
+      "sha512": "4f537696af95411e9daf15795fb5fcbc49913d488a96fa912fa8f1d7db408710995e8a1461190f3cd0f8217bf9e35e9539176592428ed587ca2d7aa84450a390"
+    },
+    {
+      "project": "iris",
+      "version": "1.8.14-beta.1+1.21.1-neoforge",
+      "artifact": "maven.modrinth:iris:KduFYu4t",
+      "filename": "iris-neoforge-1.8.14-beta.1+mc1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/KduFYu4t/iris-neoforge-1.8.14-beta.1%2Bmc1.21.1.jar",
+      "sha512": "33fddb430e16222902eac75b8b3d57c381b0f3cc729f3b56c4628df12ca108f23a0b11e2feb167923d6d14d1fc7e8ee1a977ec421b19d1951bdca74c4092b9c5"
+    },
+    {
+      "project": "sable",
+      "version": "2.0.5+mc1.21.1",
+      "artifact": "maven.modrinth:sable:U678xqle",
+      "filename": "sable-neoforge-1.21.1-2.0.5.jar",
+      "url": "https://cdn.modrinth.com/data/T9PomCSv/versions/U678xqle/sable-neoforge-1.21.1-2.0.5.jar",
+      "sha512": "bf3d8c87bcc5efb99afffd50305fc978086ed48a63e106816e3a8a3901f8052f4480ea527dbd7d4003f7775ed4d020529098034f4e307aefac9cc42df2b4c19a"
+    },
+    {
+      "project": "create",
+      "version": "6.0.10+mc1.21.1",
+      "artifact": "maven.modrinth:create:UjX6dr61",
+      "filename": "create-1.21.1-6.0.10.jar",
+      "url": "https://cdn.modrinth.com/data/LNytGWDc/versions/UjX6dr61/create-1.21.1-6.0.10.jar",
+      "sha512": "11cc8fc049d2f67f6548c7abfada6b82a3adb5c7ca410a742de04bbca76e03862c518721b88d806f6e6d768a4d68531fdb903a85859b25d1484d550cc7bafd4b"
+    },
+    {
+      "project": "create-aeronautics",
+      "version": "1.3.2+mc1.21.1",
+      "artifact": "maven.modrinth:create-aeronautics:44pLdPGg",
+      "filename": "create-aeronautics-bundled-1.21.1-1.3.2.jar",
+      "url": "https://cdn.modrinth.com/data/oWaK0Q19/versions/44pLdPGg/create-aeronautics-bundled-1.21.1-1.3.2.jar",
+      "sha512": "dc7e8e1148fa442243889ba29412207137e1bb86206e6c92bc0a589f1374a466e93de22bdbf14f753984d86c29308fbbdc0f14a4b9618b14c0ac1666a36b46f5"
+    },
+    {
+      "project": "reforgedplaymod",
+      "version": "0.3",
+      "artifact": "curse.maven:reforgedplay-mod-1018692:6942967",
+      "filename": "reforgedplaymod-1.21.1-0.3.jar",
+      "url": "https://www.curseforge.com/minecraft/mc-mods/reforgedplay-mod/files/6942967",
+      "sha512": "c75532fc88638097c03647df131378c12a0ac343693fb5617790ff65c32eba033740951123bfd1e3c9e2e83f42f417bbb47cb14721c68198a7684661a1471d1f"
+    }
+  ]
+}

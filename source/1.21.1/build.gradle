@@ -1,0 +1,138 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.146'
+}
+
+version = project.mod_version
+group = project.maven_group
+base { archivesName = 'stillwander-neoforge' }
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+    maven {
+        url = 'https://www.cursemaven.com'
+        content { includeGroup 'curse.maven' }
+    }
+    maven {
+        url = 'https://maven.ryanhcode.dev/releases'
+        content { includeGroup 'dev.ryanhcode.sable-companion' }
+    }
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+
+// Preserve upstream's client layout in this client-only NeoForge project.
+sourceSets.main.java.srcDir 'src/client/java'
+sourceSets.test {
+    compileClasspath += sourceSets.main.compileClasspath
+    runtimeClasspath += sourceSets.main.runtimeClasspath
+}
+sourceSets {
+    smoke {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
+// Development-only combinations; none of these optional mods are shipped in the JAR.
+def compatProfile = providers.gradleProperty('compatProfile').getOrElse('none')
+def smokeTest = providers.gradleProperty('smokeTest').isPresent()
+def profiles = [
+    none: [],
+    camera: ['maven.modrinth:freecam:ROfcbxxe', 'maven.modrinth:dynamic-fps:T238FZpQ'],
+    replay: ['curse.maven:reforgedplay-mod-1018692:6942967'],
+    renderer: ['maven.modrinth:sodium:uMOpc5uV', 'maven.modrinth:iris:KduFYu4t'],
+    ships: ['maven.modrinth:sable:U678xqle', 'maven.modrinth:create:UjX6dr61',
+            'maven.modrinth:create-aeronautics:44pLdPGg']
+]
+profiles.full = (profiles.camera + profiles.replay + profiles.renderer + profiles.ships).unique()
+if (!profiles.containsKey(compatProfile)) throw new GradleException("Unknown compatProfile: $compatProfile")
+configurations { compatMods }
+def compatDirectory = file("${smokeTest ? 'run-smoke' : 'run-compat'}/$compatProfile")
+// Loading the unmodified distributions from mods/ also preserves Sodium's nested mod discovery.
+def prepareCompatMods = tasks.register('prepareCompatMods', Copy) {
+    from configurations.compatMods
+    into new File(compatDirectory, 'mods')
+}
+
+neoForge {
+    version = project.neo_version
+    parchment {
+        minecraftVersion = '1.21.1'
+        mappingsVersion = '2024.11.17'
+    }
+    runs {
+        client {
+            client()
+            if (compatProfile != 'none' || smokeTest) {
+                gameDirectory = compatDirectory
+                taskBefore prepareCompatMods
+            }
+            if (smokeTest) {
+                systemProperty 'stillwander.smoke', 'true'
+                systemProperty 'stillwander.compatProfile', compatProfile
+            }
+        }
+    }
+    mods {
+        stillwander {
+            sourceSet sourceSets.main
+            if (smokeTest) sourceSet sourceSets.smoke
+        }
+    }
+}
+
+dependencies {
+    profiles[compatProfile].each { compatMods it }
+    implementation 'dev.ryanhcode.sable-companion:sable-companion-common-1.21.1:1.6.0'
+    jarJar('dev.ryanhcode.sable-companion:sable-companion-common-1.21.1:[1.6.0,2.0.0)') {
+        version { prefer '1.6.0' }
+    }
+    compileOnly 'maven.modrinth:sable:U678xqle'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+    testImplementation 'org.ow2.asm:asm-tree:9.8'
+    // Inspect the exact optional APIs in tests without making these gameplay dependencies.
+    testRuntimeOnly 'maven.modrinth:dynamic-fps:T238FZpQ'
+    testRuntimeOnly 'maven.modrinth:freecam:ROfcbxxe'
+    testRuntimeOnly 'curse.maven:reforgedplay-mod-1018692:6942967'
+}
+
+tasks.named('test', Test) { useJUnitPlatform() }
+
+tasks.named('runClient').configure {
+    if (smokeTest) {
+        doFirst {
+            compatDirectory.mkdirs()
+            new File(compatDirectory, 'stillwander-smoke-result.txt').text = 'RUNNING\n'
+        }
+        doLast {
+            def result = new File(compatDirectory, 'stillwander-smoke-result.txt')
+            if (!result.isFile() || !result.readLines().contains('SUCCESS')) {
+                throw new GradleException("Compatibility smoke test failed or was interrupted: $result")
+            }
+        }
+    }
+}
+
+tasks.named('jar', Jar) {
+    from('../../LICENSE')
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand 'version': project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
