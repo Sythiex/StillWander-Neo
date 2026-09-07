@@ -49,6 +49,8 @@ Prebuilt downloads are not provided for this port. Download the JAR from a succe
 
 Built-in integrations support **Freecam, Dynamic FPS, ReForgedPlay, Sable, and Iris**. Sable Companion 1.6.0 is bundled. See [COMPATIBILITY.md](COMPATIBILITY.md) for integration behavior, tested versions, and remaining checks.
 
+While aboard a Sable sublevel, landscape cameras travel with you. Wide and aerial panoramas keep their compass orientation and a level horizon through ship turns and banks, while retaining their slow cinematic sweeps. Other landscape views prefer scenery ahead of travel and can watch it pass before cutting. Moving subjects and fallback views also stay within reach of the player. These adaptations apply only aboard sublevels; ordinary director behavior is retained.
+
 The original Fabric release is available from [upstream Still Wander 1.0.0](https://github.com/Prasanna163/StillWander/releases/tag/v1.0.0).
 
 ## Install

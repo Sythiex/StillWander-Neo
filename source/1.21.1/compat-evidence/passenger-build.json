@@ -1,0 +1,24 @@
+{
+  "date": "2026-09-06",
+  "artifact": "stillwander-neoforge-1.1.0-alpha.1+1.21.1.jar",
+  "sha256": "7a5bde168c55cc0fca39846158f1e3d4765ec73ee5bc0c878ff3b2dd526c3896",
+  "cleanBuild": "PASS",
+  "command": ".\\gradlew.bat -p source/1.21.1 clean test build --no-build-cache --no-daemon --console=plain",
+  "gradleTaskExecution": "10 actionable tasks: 10 executed",
+  "minecraftArtifactPreparation": "NeoForm intermediate cache reused",
+  "junit": {
+    "tests": 54,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "smokeChecks": {
+    "none": 14,
+    "full": 30
+  },
+  "passengerRegression": "PASS: actual seated Camera.setup at partial ticks 0.25, 0.5, 1.0 for world landmarks and compass-stable panoramas through translation, yaw, pitch, and bank",
+  "travelRecovery": "PASS: lost carried view replans without ending capture or releasing FPS; ordinary fatal failure still releases FPS",
+  "releaseAndSourceJarsExcludeSmokeFixtures": true,
+  "artifactChecks": "Java 21 bytecode; NeoForge metadata; license; five client mixins; only Sable Companion embedded; no Fabric metadata",
+  "remainingQualification": "Visual piloted-aircraft comfort, real long-flight chunk streaming, dismounts/transfers, and fifteen-minute performance review"
+}

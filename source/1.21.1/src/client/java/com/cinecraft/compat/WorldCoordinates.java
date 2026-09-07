@@ -92,9 +92,12 @@ public final class WorldCoordinates {
     }
 
     public static ShotReferenceFrame referenceFrame(Entity entity, Vec3 target) {
+        return referenceFrame(entity.level(), shipOf(entity), target);
+    }
+
+    public static SubLevelAccess shipOf(Entity entity) {
         SubLevelAccess ship = SableCompanion.INSTANCE.getContaining(entity);
-        if (ship == null) ship = SableCompanion.INSTANCE.getTrackingOrVehicleSubLevel(entity);
-        return referenceFrame(entity.level(), ship, target);
+        return ship == null ? SableCompanion.INSTANCE.getTrackingOrVehicleSubLevel(entity) : ship;
     }
 
     public static ShotReferenceFrame referenceFrame(Level level, SubLevelAccess ship, Vec3 target) {

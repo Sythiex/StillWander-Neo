@@ -7,6 +7,8 @@ import com.cinecraft.camera.StaticShot;
 import com.cinecraft.camera.TrackedMovingShot;
 import com.cinecraft.camera.ValidatedShot;
 import com.cinecraft.compat.TemporaryBooleanState;
+import com.cinecraft.compat.SublevelCameraPolicy;
+import com.cinecraft.compat.CarriedShot;
 import com.cinecraft.config.CinecraftConfig;
 import net.minecraft.client.Minecraft;
 
@@ -33,6 +35,7 @@ public final class CinematicDirector {
     private int shotNumber;
     private long lastSurveyMicros;
     private final TemporaryBooleanState hud = new TemporaryBooleanState();
+    private final SublevelCameraPolicy sublevels = new SublevelCameraPolicy();
 
     public CinematicDirector() {
         this(new Random());
@@ -53,19 +56,46 @@ public final class CinematicDirector {
     public void tick(Minecraft client) {
         hud.apply(CinecraftConfig.INSTANCE.hideHud() && !CinecraftConfig.INSTANCE.debugOverlay(),
                 () -> client.options.hideGui, hidden -> client.options.hideGui = hidden);
+        if (sublevels.update(client)) {
+            nextShot();
+            profile = null;
+        }
+        updateShot(client);
+        if (currentPose == null && currentShot instanceof CarriedShot && sublevels.active()) {
+            // Only carried shots own recoverable travel failures. Other null samples still end the session.
+            nextShot();
+            profile = null;
+            updateShot(client);
+            if (currentPose == null && currentShot instanceof CarriedShot) {
+                CameraPose fallback = scanner.findPlayerView(client);
+                if (fallback != null) {
+                    currentShotType = null;
+                    currentSubjectType = SubjectType.PLAYER;
+                    currentAction = EntityAction.STILL;
+                    currentComposition = null;
+                    currentSubjectKey = "player";
+                    currentShot = sublevels.fallback(client, scanner, fallback, profile);
+                    currentPose = currentShot.sample(1.0f);
+                }
+            }
+        }
+        if (currentPose == null) stop();
+    }
+
+    private void updateShot(Minecraft client) {
         if (currentShot == null || currentShot.finished()) {
-            if (profile == null || shotNumber % 4 == 0) {
+            if (profile == null || shotNumber % 4 == 0 || sublevels.active()) {
                 long surveyStarted = System.nanoTime();
                 profile = scanner.survey(client);
                 lastSurveyMicros = (System.nanoTime() - surveyStarted) / 1_000L;
             }
             ShotSelection selection = chooseShot(client, profile);
             boolean wide = selection.wide();
-            SceneSubject subject = selection.subject();
+            SceneSubject subject = sublevels.prepareSubject(client, scanner, selection.subject(), wide);
             Optional<ShotPlan> planned = planner.plan(client, scanner, subject, profile, wide);
             if (planned.isEmpty() && wide) {
                 wide = false;
-                subject = scanner.findEnvironmentSubject(client);
+                subject = sublevels.prepareSubject(client, scanner, scanner.findEnvironmentSubject(client), false);
                 planned = planner.plan(client, scanner, subject, profile, false);
             }
             if (planned.isEmpty() && subject.type() != SubjectType.PLAYER) {
@@ -80,7 +110,9 @@ public final class CinematicDirector {
                 currentAction = subject.action();
                 currentComposition = plan.composition();
                 currentSubjectKey = subject.key();
-                if (subject.hasLiveTracking()) {
+                if (sublevels.active()) {
+                    currentShot = sublevels.createShot(client, scanner, subject, plan, profile);
+                } else if (subject.hasLiveTracking()) {
                     currentShot = new TrackedMovingShot(
                             plan.path(),
                             plan.focusPath(),
@@ -103,20 +135,21 @@ public final class CinematicDirector {
             } else {
                 CameraPose startingPose = scanner.findPlayerView(client);
                 if (startingPose == null) {
-                    stop();
+                    currentShot = null;
+                    currentPose = null;
                     return; // Never force the camera through a wall.
                 }
                 currentShotType = null;
                 currentSubjectType = SubjectType.PLAYER;
-                currentShot = new StaticShot(startingPose, 4_000L);
+                currentShot = sublevels.active() ? sublevels.fallback(client, scanner, startingPose, profile)
+                        : new StaticShot(startingPose, 4_000L);
             }
-            if (!(currentShot instanceof TrackedMovingShot)) {
+            if (!(currentShot instanceof TrackedMovingShot) && !(currentShot instanceof CarriedShot)) {
                 currentShot = new ValidatedShot(currentShot, pose -> scanner.isPoseUsable(client, pose));
             }
             shotNumber++;
         }
         currentPose = currentShot.sample(1.0f);
-        if (currentPose == null) stop();
     }
 
     private ShotSelection chooseShot(Minecraft client, EnvironmentProfile currentProfile) {
@@ -206,6 +239,7 @@ public final class CinematicDirector {
         lastSurveyMicros = 0L;
         scanner.resetSubjects();
         planner.reset();
+        sublevels.reset();
         Minecraft client = Minecraft.getInstance();
         if (client != null) hud.restore(() -> client.options.hideGui, hidden -> client.options.hideGui = hidden);
     }

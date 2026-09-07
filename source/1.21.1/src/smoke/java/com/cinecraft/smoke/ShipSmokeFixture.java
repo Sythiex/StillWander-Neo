@@ -6,6 +6,19 @@ import com.cinecraft.camera.CameraPose;
 import com.cinecraft.camera.CinematicShot;
 import com.cinecraft.camera.LookAt;
 import com.cinecraft.compat.WorldCoordinates;
+import com.cinecraft.compat.CarriedShot;
+import com.cinecraft.compat.SublevelCameraPolicy;
+import com.cinecraft.camera.FovPath;
+import com.cinecraft.compat.CinecraftFlawlessFrames;
+import com.cinecraft.director.EntityAction;
+import com.cinecraft.director.Framing;
+import com.cinecraft.director.SceneScanner;
+import com.cinecraft.director.SceneSubject;
+import com.cinecraft.director.ScreenPlacement;
+import com.cinecraft.director.ShotComposition;
+import com.cinecraft.director.ShotPlan;
+import com.cinecraft.director.ShotType;
+import com.cinecraft.director.SubjectType;
 import dev.ryanhcode.sable.api.SubLevelAssemblyHelper;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.companion.SableCompanion;
@@ -169,6 +182,84 @@ final class ShipSmokeFixture {
     private static void assertDirection(Vec3 actual, Vec3 expected, String label) {
         if (!WorldCoordinates.finite(actual) || actual.distanceTo(expected) > 0.00001) {
             throw new AssertionError(label + ": expected " + expected + ", got " + actual);
+        }
+    }
+
+    static void validatePassengerLandscapes(Minecraft client) throws ReflectiveOperationException {
+        var ship = (ClientSubLevelAccess) WorldCoordinates.shipOf(client.player);
+        if (ship == null || !client.player.isPassenger()) throw new AssertionError("Passenger landscape fixture needs a seated player");
+        var shotField = CinecraftClient.DIRECTOR.getClass().getDeclaredField("currentShot");
+        shotField.setAccessible(true);
+        Object savedShot = shotField.get(CinecraftClient.DIRECTOR);
+        if (!(savedShot instanceof CarriedShot)) throw new AssertionError("Director must use carried execution aboard a sublevel");
+        Pose3d logical = (Pose3d) ship.logicalPose();
+        Pose3d last = (Pose3d) ship.lastPose();
+        Pose3d savedLogical = new Pose3d(logical), savedLast = new Pose3d(last);
+        Camera camera = client.gameRenderer.getMainCamera();
+        try {
+            SceneScanner scanner = new SceneScanner(new java.util.Random(781));
+            var profile = scanner.survey(client);
+            for (boolean panorama : new boolean[]{false, true}) {
+                logical.set(savedLogical);
+                last.set(savedLast);
+                ship.renderPose(0); // Clear Sable's pose cache after fixture edits.
+                Vec3 origin = WorldCoordinates.entityPosition(client.player);
+                Vec3 localOrigin = logical.transformPositionInverse(origin);
+                Vec3 position = origin.add(5, 10, 7);
+                Vec3 target = origin.add(30, 10, 20);
+                var composition = new ShotComposition(Framing.WIDE, ScreenPlacement.LEFT_THIRD, 0, EntityAction.STILL, false);
+                var subject = new SceneSubject(SubjectType.LANDSCAPE, target, "smoke:passing-scenery");
+                var plan = new ShotPlan(panorama ? ShotType.PROCEDURAL_PANORAMA : ShotType.PROCEDURAL_TRAVERSE,
+                        progress -> position, progress -> composition.focus(position, target, 60),
+                        progress -> target, FovPath.fixed(60), 60_000, composition, "smoke:passenger");
+                SublevelCameraPolicy policy = new SublevelCameraPolicy();
+                policy.update(client);
+                CinematicShot carried = policy.createShot(client, scanner, subject, plan, profile);
+                shotField.set(CinecraftClient.DIRECTOR, carried);
+                last.set(logical);
+                logical.position().add(8, 0, 0);
+                logical.orientation().rotateY(0.7).rotateX(0.3).rotateZ(0.4);
+                ship.renderPose(0);
+                for (float partial : new float[]{0.25f, 0.5f, 1}) {
+                    Vec3 displacement = ship.renderPose(partial).transformPosition(localOrigin).subtract(origin);
+                    Vec3 expectedPosition = position.add(displacement);
+                    Vec3 expectedFocus = panorama ? composition.focus(position, target, 60).add(displacement)
+                            : composition.focus(expectedPosition, target, 60);
+                    camera.setup(client.level, client.player, false, false, partial);
+                    if (camera.getPosition().distanceTo(expectedPosition) > 0.0001 || camera.getRoll() != 0) {
+                        throw new AssertionError("Landscape camera must travel with passenger without rotating its offset: panorama=" + panorama);
+                    }
+                    assertDirection(new Vec3(camera.getLookVector()), expectedFocus.subtract(expectedPosition).normalize(),
+                            panorama ? "compass-stable passenger panorama" : "transported camera keeps world landmark");
+                }
+            }
+        } finally {
+            logical.set(savedLogical);
+            last.set(savedLast);
+            ship.renderPose(0);
+            shotField.set(CinecraftClient.DIRECTOR, savedShot);
+            camera.setup(client.level, client.player, false, false, 1);
+        }
+    }
+
+    static void validateTravelCut(Minecraft client) throws ReflectiveOperationException {
+        if (!CinecraftClient.isRecordingMode()) throw new AssertionError("Travel cut must start during capture");
+        Vec3 origin = WorldCoordinates.entityPosition(client.player);
+        var composition = new ShotComposition(Framing.WIDE, ScreenPlacement.CENTER, 0, EntityAction.STILL, false);
+        var plan = new ShotPlan(ShotType.PROCEDURAL_PANORAMA, p -> origin.add(5, 8, 0),
+                p -> origin.add(20, 8, 0), p -> origin.add(20, 8, 0), FovPath.fixed(60), 60_000, composition, "smoke:lost-view");
+        var field = CinecraftClient.DIRECTOR.getClass().getDeclaredField("currentShot");
+        field.setAccessible(true);
+        field.set(CinecraftClient.DIRECTOR, new CarriedShot(plan, ShotReferenceFrame.WORLD,
+                new CarriedShot.Tracking(origin, () -> origin, () -> false, false, false), true,
+                (camera, focus) -> false, () -> false));
+        var tick = CinecraftClient.class.getDeclaredMethod("tick", net.neoforged.neoforge.client.event.ClientTickEvent.Post.class);
+        tick.setAccessible(true);
+        tick.invoke(null, new Object[]{null});
+        if (!CinecraftClient.isRecordingMode() || !CinecraftClient.DIRECTOR.isActive() || !CinecraftFlawlessFrames.isRequested()
+                || !(field.get(CinecraftClient.DIRECTOR) instanceof CarriedShot)
+                || CinecraftClient.DIRECTOR.pose(1) == null) {
+            throw new AssertionError("Lost travel view must cut to a safe carried shot without releasing capture or FPS");
         }
     }
 

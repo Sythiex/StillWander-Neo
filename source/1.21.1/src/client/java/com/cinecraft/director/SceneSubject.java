@@ -127,6 +127,17 @@ public final class SceneSubject {
     public boolean isGroup() { return type == SubjectType.GROUP; }
     public boolean hasLiveTracking() { return trackedEntity != null || anchor != null; }
 
+    /** Mixed groups must not drag the passenger's camera into another reference frame. */
+    public boolean belongsTo(dev.ryanhcode.sable.companion.SubLevelAccess ship) {
+        if (ship == null) return false;
+        boolean primary = anchor != null ? anchor.ship() == ship
+                : trackedEntity != null && WorldCoordinates.shipOf(trackedEntity) == ship;
+        if (!primary) return false;
+        if (secondaryFeature != null) return secondaryFeature.belongsTo(ship);
+        if (secondaryEntity != null) return WorldCoordinates.shipOf(secondaryEntity) == ship;
+        return secondaryTarget == null;
+    }
+
     public Vec3 movementVector() {
         if (trackedEntity == null) return Vec3.ZERO;
         Vec3 movement = WorldCoordinates.entityVelocity(trackedEntity);

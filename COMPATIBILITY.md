@@ -4,13 +4,15 @@ Tested on 2026-09-06 using NeoForge 21.1.250 and Java 21.0.5. These are developm
 
 ## Latest recorded verification
 
-The seated-camera follow-up is the latest recorded run, completed on 2026-09-06:
+The latest automated follow-up, on 2026-09-07, passed **56 tests** and `clean test build --no-daemon --console=plain` (all ten tasks executed). It fixes loaded-sightline traversal overshooting mixed-direction chunk-corner endpoints. The new regression failed before the fix and now covers both traversal directions, positive and negative boundaries, multi-chunk segments, and missing endpoint chunks. In-game smoke checks were not rerun for this fix.
+
+The latest combined automated and in-game passenger-camera run was completed on 2026-09-06:
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Clean automated gate | **38 tests passed**, no failures, errors, or skips | [Build, artifact hash, and counts](source/1.21.1/compat-evidence/seated-build.json) |
-| Standalone smoke | **14 checks passed** | [Standalone result](source/1.21.1/compat-evidence/seated-none-smoke.txt) |
-| Full pinned set smoke | **28 checks passed** | [Full-set result](source/1.21.1/compat-evidence/seated-full-smoke.txt) |
+| Clean automated gate | **54 tests passed**, no failures, errors, or skips | [Build, artifact hash, and counts](source/1.21.1/compat-evidence/passenger-build.json) |
+| Standalone smoke | **14 checks passed** | [Standalone result](source/1.21.1/compat-evidence/passenger-none-smoke.txt) |
+| Full pinned set smoke | **30 checks passed** | [Full-set result](source/1.21.1/compat-evidence/passenger-full-smoke.txt) |
 
 The clean gate used `clean test build --no-build-cache --no-daemon --console=plain`: all ten Gradle tasks executed, including production/test compilation and tests. NeoForm reused its Minecraft preparation intermediates. Artifact inspection confirmed that both release and source JARs exclude smoke fixtures.
 
@@ -74,6 +76,18 @@ The seated-player follow-up reproduced Sable 2.0.5 applying inherited ship rotat
 
 The latest full-set fixture mounts the player in an actual Create seat on the moving, rotated Sable platform, verifies nontrivial inherited rotation, and calls the transformed main camera's `setup` at partial ticks 0.25, 0.5, and 1.0 with a controlled world-space focus. It checks the actual look vector, quaternion, Euler angles, up/left basis, position, and zero roll, then compares the released camera with an ordinary seated camera. This checks camera state in a running game; it is not a visual motion-smoothness or dismount review.
 
+### Passenger landscapes and travel recovery
+
+Landscape shots previously kept world-space camera paths even when the passenger's ship moved. Wide/aerial panoramas now carry their authored viewing sweep in world compass axes, with zero camera roll, while other landscape compositions can follow a fixed world landmark from a moving camera. Landmark selection prefers approaching scenery to either side of actual travel. Existing procedural passage views retain their path-directed aim; same-ship subjects retain local rigs and tracking. External subjects, mixed groups, and close player fallbacks also use the passenger's carrier and live distance limits.
+
+Sublevel shots survey the current surroundings at every cut, check loaded sightline chunks and moving geometry during sampling, and transport any safe fallback before revalidating it. A lost carried view gets a bounded replan and, if needed, a close player fallback without ending capture. Ordinary fatal failures still release the session and FPS request. Outside sublevels, the original selection weights, RNG draws, four-shot survey cadence, and shot execution remain in use.
+
+The automated additions cover long translation, turns/banks and partial-tick interpolation, compass-stable authored pans, fixed world targets, independent external subject motion, local onboard tracking, transported fallbacks, target/frame loss, non-finite samples, distance limits, ahead/side preference, pass timing, comfort limits, and loaded sightlines across intermediate, negative, and corner-adjacent chunks. An absent-sublevel policy leaves subject selection untouched.
+
+The full smoke fixture verifies that the real director installs carried shots for a seated passenger. It then uses controlled landscape plans and temporarily changes the real client ship poses to exercise translation, yaw, pitch, and bank at partial ticks 0.25, 0.5, and 1.0 through the transformed `Camera.setup`. Both the fixed landmark and compass-stable panorama passed position/orientation checks. Another check forces a carried view loss and verifies a safe replacement with capture and the FPS request still active. Existing fatal-shot FPS release and camera/replay handoffs also passed.
+
+This is automated camera-state verification on the moving platform, not a visual flight review of a complex Aeronautics craft. Real chunk streaming during long flights, dismounts and transfers between ships, comfort/timing tuning, and the fifteen-minute performance baseline remain in the release matrix. The scenery preference uses the existing loaded surface search; this change does not expand its terrain search depth or distance.
+
 ## Evidence history
 
 These earlier records are preserved unchanged. Their counts describe each historical run; use [Latest recorded verification](#latest-recorded-verification) for the most recent results.
@@ -83,6 +97,7 @@ These earlier records are preserved unchanged. Their counts describe each histor
 | Original compatibility pass | 33 automated tests; 14 standalone, 18 camera-mod, and 25 full-set smoke checks passed | [Build](source/1.21.1/compat-evidence/build.json), [standalone](source/1.21.1/compat-evidence/none-smoke.txt), [camera mods](source/1.21.1/compat-evidence/camera-smoke.txt), [full set](source/1.21.1/compat-evidence/full-smoke.txt) |
 | Reviewer regressions | 38 automated tests; 14 standalone and 27 full-set smoke checks passed; smoke fixtures excluded from both JARs | [Build](source/1.21.1/compat-evidence/review-build.json), [standalone](source/1.21.1/compat-evidence/review-none-smoke.txt), [full set](source/1.21.1/compat-evidence/review-full-smoke.txt) |
 | Seated camera before fix | Failure reproduced: actual camera look vector differed from the world-space focus | [Before-fix result](source/1.21.1/compat-evidence/seated-before-smoke.txt) |
+| Seated camera follow-up | 38 automated tests; 14 standalone and 28 full-set smoke checks passed | [Build](source/1.21.1/compat-evidence/seated-build.json), [standalone](source/1.21.1/compat-evidence/seated-none-smoke.txt), [full set](source/1.21.1/compat-evidence/seated-full-smoke.txt) |
 
 ## Remaining release matrix
 

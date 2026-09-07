@@ -21,6 +21,9 @@ The automated suite covers deterministic continuity rules, bounded state, camera
 - Replay playback, pause, seeking, editing, and export must never acquire Still Wander camera/control ownership. Ordinary recording is eligible. No replay files, packets, or timelines may be changed by the mod.
 - Ship camera rigs retain local offsets across logical and render poses. Cinematic angles are world-space: the final camera quaternion, direction vectors, and Euler angles must face the planned focus without inheriting a mounted seat's ship rotation again. Verify the transformed camera with an actually seated player on a rotated ship, and verify ordinary camera behavior resumes after ownership ends. Missing ship geometry or non-finite positions must fail closed, and moving obstacles invalidate previously safe poses. Collision and raycast candidates must include the sampled rendered hull even when translation or intermediate rotation places it outside logical bounds and fixed padding.
 - The scanner must inspect loaded world state only and must not mutate the world.
+- Aboard sublevels, camera transport is independent of subject tracking. Landscape offsets stay aligned with world axes while following a passenger-adjacent point on the ship. Panoramas retain authored world-space sweeps without inheriting pilot yaw, pitch, or roll; fixed landmarks remain in world space. Other ships and mixed groups must not drag the rig away from the passenger. Same-ship subjects may retain local rigs and local tracking.
+- Sublevel shots recheck distance from the live player, loaded sightline chunks, and collision clearance for every returned pose, including transported fallbacks. A failed carried view may trigger one fresh plan and a close player fallback; it must never reuse a frozen world-space camera or force chunk loading. Unrelated fatal-shot failures retain ordinary session shutdown and FPS-release semantics. Boarding, leaving, changing, or losing a ship invalidates the previous carrier.
+- Sublevel surveys refresh at each new shot; ordinary surveys keep the four-shot cadence. Sublevel selection and execution must not consume extra random draws outside sublevels. Forward scenery preference uses actual horizontal travel, has no directional bias below 0.5 blocks/second, and remains subordinate to view safety. Passing shots allow a two-second recession, subject to their ordinary duration and safety limits; close passes above 30 degrees/second estimated angular motion are rejected.
 - The existing planner remains the fallback when no continuity-aware candidate is safe.
 
 ## Fixed visual matrix
@@ -41,6 +44,8 @@ For each environment, review smoothness, composition, continuity, variety, colli
 ## Performance baseline
 
 The opt-in debug overlay reports scene-survey and shot-planning time in microseconds. The director also retains the latest 32 accepted `ShotTrace` records for diagnostic integrations. Compare median and worst observed values over a fifteen-minute session with the last accepted milestone. A regression must be investigated before release; raising scan or candidate budgets requires its own reviewed change.
+
+The passenger policy increases survey frequency only aboard sublevels and performs additional loaded-chunk checks during sampling. Include long flights and repeated safety cuts in this performance review. Unit and smoke results do not establish a fifteen-minute performance baseline or passenger comfort on complex piloted craft.
 
 ## Phase 1 continuity contract
 

@@ -576,20 +576,7 @@ public final class ShotPlanner {
             Vec3 camera = frame.render(frame.planned(cameraPath.sample(progress)),
                     com.cinecraft.compat.WorldCoordinates.samplePartialTick());
             Vec3 subject = subjectPath.sample(progress);
-            Vec3 view = subject.subtract(camera);
-            double horizontal = Math.sqrt(view.x * view.x + view.z * view.z);
-            if (horizontal < 0.001) return subject;
-            Vec3 right = new Vec3(-view.z / horizontal, 0.0, view.x / horizontal);
-            double fovScale = Math.tan(Math.toRadians(clamp(fovPath.sample(progress), 24.0, 90.0) * 0.5));
-            double placementOffset = composition.placement().direction()
-                    * Math.min(3.5, horizontal * fovScale * 0.16);
-            double headroom = switch (composition.framing()) {
-                case DETAIL -> -0.02;
-                case CLOSE -> -0.035;
-                case MEDIUM -> -0.055;
-                case WIDE, EXTREME_WIDE -> -0.075;
-            };
-            return subject.add(right.scale(placementOffset)).add(0.0, horizontal * headroom, 0.0);
+            return composition.focus(camera, subject, fovPath.sample(progress));
         };
     }
 

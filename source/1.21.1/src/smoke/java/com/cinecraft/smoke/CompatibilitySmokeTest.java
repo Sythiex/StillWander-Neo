@@ -115,6 +115,10 @@ public final class CompatibilitySmokeTest {
             if (ticks == 132 && ModList.get().isLoaded("sable")) {
                 ShipSmokeFixture.validateSeatedCamera(client);
                 check(true, "seated rotated ship camera faces world focus at three partial ticks and restores ordinary view");
+                ShipSmokeFixture.validatePassengerLandscapes(client);
+                check(true, "seated landmark and compass-stable panorama travel through translation, turns, and banks at three partial ticks");
+                ShipSmokeFixture.validateTravelCut(client);
+                check(true, "lost sublevel view replans without ending capture or releasing FPS request");
             }
             if (ticks == 140) {
                 check(CinecraftClient.isRecordingMode(), "standalone capture starts");

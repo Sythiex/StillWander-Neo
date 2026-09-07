@@ -69,6 +69,20 @@ public final class SceneScanner {
         return new SceneSubject(SubjectType.LANDSCAPE, center, key);
     }
 
+    /** Sublevel-only preference; the ordinary scanner keeps its original selection and random draws. */
+    public SceneSubject landscapeAhead(Minecraft client, Vec3 velocity, SceneSubject fallback) {
+        List<WeightedSubject> candidates = new ArrayList<>();
+        collectLandscapes(client, candidates);
+        Vec3 origin = WorldCoordinates.entityPosition(client.player);
+        return candidates.stream()
+                .filter(candidate -> candidate.subject().key().equals(fallback.key())
+                        || !recentSubjects.contains(candidate.subject().key()))
+                .max(Comparator.comparingDouble(candidate -> candidate.score()
+                        + com.cinecraft.compat.TravelViewRules.aheadScore(origin, candidate.subject().target(), velocity)))
+                .map(candidate -> { remember(candidate.subject().key()); return candidate.subject(); })
+                .orElse(fallback);
+    }
+
     /** Selects armor or an occupied hand as a live character-detail target. */
     public SceneSubject playerDetailSubject(Minecraft client) {
         Player player = client.player;
@@ -403,6 +417,10 @@ public final class SceneScanner {
                 || !Float.isFinite(pose.focusDistance()) || pose.focusDistance() <= 0.0f) return false;
         Vec3 focus = pose.position().add(Vec3.directionFromRotation(pose.pitch(), pose.yaw()).scale(pose.focusDistance()));
         return isUsable(client, pose.position(), focus);
+    }
+
+    public boolean isViewUsable(Minecraft client, Vec3 camera, Vec3 focus) {
+        return isUsable(client, camera, focus);
     }
 
     /** Finds a collision-clear 3D corridor between two intended rail endpoints. */
