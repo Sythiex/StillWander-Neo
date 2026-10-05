@@ -48,6 +48,7 @@ public final class CinecraftClient {
     private static KeyMapping nextShot;
     private static boolean manualActivation;
     private static boolean recordingMode;
+    private static boolean appliedAutoStartCamera = true;
 
     public static void activity() {
         if (!canRun()) return;
@@ -80,7 +81,15 @@ public final class CinecraftClient {
     }
 
     public static void applyConfiguration() {
-        IDLE.setTimeoutMillis(CinecraftConfig.INSTANCE.idleSeconds() * 1_000L);
+        CinecraftConfig config = CinecraftConfig.INSTANCE;
+        IDLE.setTimeoutMillis(config.idleSeconds() * 1_000L);
+        if (appliedAutoStartCamera != config.autoStartCamera()) {
+            appliedAutoStartCamera = config.autoStartCamera();
+            IDLE.activity();
+            if (!appliedAutoStartCamera && !manualActivation && !recordingMode && DIRECTOR.isActive()) {
+                stopCinematic(false);
+            }
+        }
     }
 
     public static boolean isRecordingMode() {
@@ -89,7 +98,11 @@ public final class CinecraftClient {
 
     /** True slightly before, and for the full lifetime of, any cinematic session. */
     public static boolean requiresUnthrottledRendering() {
-        return canRun() && (recordingMode || manualActivation || IDLE.isIdle() || DIRECTOR.isActive());
+        return canRun() && (cinematicRequested() || DIRECTOR.isActive());
+    }
+
+    private static boolean cinematicRequested() {
+        return recordingMode || manualActivation || (CinecraftConfig.INSTANCE.autoStartCamera() && IDLE.isIdle());
     }
 
     public static boolean canRun() {
@@ -143,8 +156,7 @@ public final class CinecraftClient {
             stopCinematic(true);
             return;
         }
-        boolean cinematicRequested = recordingMode || manualActivation || IDLE.isIdle();
-        if (cinematicRequested) {
+        if (cinematicRequested()) {
             CinecraftFlawlessFrames.setActive(true);
             DIRECTOR.tick(client);
             if (!DIRECTOR.isActive()) {

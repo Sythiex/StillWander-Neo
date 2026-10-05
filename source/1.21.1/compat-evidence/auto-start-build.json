@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-04",
+  "artifact": "stillwander-neoforge-1.1.0-alpha.1+1.21.1.jar",
+  "sha256": "e098141f6fb253a232d04032b1b34839640794569c158ec4a9c89e89e9eefe10",
+  "cleanBuild": "PASS",
+  "command": ".\\gradlew.bat -p source/1.21.1 clean test build --no-daemon --console=plain",
+  "gradleTaskExecution": "10 actionable tasks: 9 executed, 1 from cache (compileTestJava)",
+  "minecraftArtifactPreparation": "NeoForm intermediate cache reused",
+  "junit": {
+    "tests": 61,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "autoStartRegression": "Five headless tests passed: config defaults/persistence/reset, expired-idle eligibility, automatic cleanup before rendering release, manual/capture preservation, and countdown transitions",
+  "remainingQualification": "In-game menu layout, B/F8 controls, HUD restoration, and actual Dynamic FPS power-state checks were not rerun for this change"
+}

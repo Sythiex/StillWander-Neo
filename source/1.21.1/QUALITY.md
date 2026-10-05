@@ -14,6 +14,7 @@ The automated suite covers deterministic continuity rules, bounded state, camera
 
 ## Safety invariants
 
+- Auto-start camera controls only idle-triggered activation and its rendering request. Off must leave manual and capture controls eligible, stop any automatic session through normal cleanup, and persist across restarts. Changing the option resets idle time without cancelling manual/capture sessions; re-enabling waits a full idle delay. Configs without the option and Reset retain the default On behavior.
 - Collision and visibility validation remains authoritative over editorial scoring.
 - Camera and focus samples must be finite.
 - FOV tracks must remain inside the planner's supported range.

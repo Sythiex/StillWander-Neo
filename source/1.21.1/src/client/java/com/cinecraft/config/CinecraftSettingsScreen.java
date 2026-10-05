@@ -31,28 +31,32 @@ public final class CinecraftSettingsScreen extends Screen {
         int right = width / 2 + 4;
         int top = 48;
         if (page == 0) {
-            addCycle(left, top, "Idle delay", () -> config.idleSeconds() + "s", () -> {
+            addToggle(left, top, "Auto-start camera", config::autoStartCamera, value -> {
+                config.autoStartCamera(value);
+                CinecraftClient.applyConfiguration();
+            });
+            addCycle(right, top, "Idle delay", () -> config.idleSeconds() + "s", () -> {
                 config.idleSeconds(next(config.idleSeconds(), new int[]{10, 15, 25, 45, 60, 120}));
                 CinecraftClient.applyConfiguration();
             });
-            addCycle(right, top, "Path quality", () -> pretty(config.quality()), () ->
+            addCycle(left, top + ROW_GAP, "Path quality", () -> pretty(config.quality()), () ->
                     config.quality(next(config.quality(), QualityPreset.values())));
-            addCycle(left, top + ROW_GAP, "Shot length", () -> format(config.shotLengthMultiplier()), () ->
+            addCycle(right, top + ROW_GAP, "Shot length", () -> format(config.shotLengthMultiplier()), () ->
                     config.shotLengthMultiplier(next(config.shotLengthMultiplier(), new double[]{0.75, 1.0, 1.25, 1.5})));
-            addCycle(right, top + ROW_GAP, "Camera speed", () -> format(config.cameraSpeed()), () ->
+            addCycle(left, top + ROW_GAP * 2, "Camera speed", () -> format(config.cameraSpeed()), () ->
                     config.cameraSpeed(next(config.cameraSpeed(), new double[]{0.65, 0.85, 1.0, 1.2, 1.4})));
-            addCycle(left, top + ROW_GAP * 2, "Zoom strength", () -> format(config.zoomStrength()), () ->
+            addCycle(right, top + ROW_GAP * 2, "Zoom strength", () -> format(config.zoomStrength()), () ->
                     config.zoomStrength(next(config.zoomStrength(), new double[]{0.0, 0.5, 1.0, 1.35, 1.7})));
-            addCycle(right, top + ROW_GAP * 2, "Screenshots", () -> config.screenshotIntervalSeconds() == 0
+            addCycle(left, top + ROW_GAP * 3, "Screenshots", () -> config.screenshotIntervalSeconds() == 0
                     ? "Off"
                     : config.screenshotIntervalSeconds() + "s", () -> config.screenshotIntervalSeconds(next(
                     config.screenshotIntervalSeconds(),
                     new int[]{0, 10, 20, 30, 60}
             )));
-            addToggle(left, top + ROW_GAP * 3, "Hide HUD", config::hideHud, config::hideHud);
-            addToggle(right, top + ROW_GAP * 3, "Exit on damage", config::exitOnDamage, config::exitOnDamage);
-            addToggle(left, top + ROW_GAP * 4, "Focus effects", config::focusEffects, config::focusEffects);
-            addToggle(right, top + ROW_GAP * 4, "Debug overlay", config::debugOverlay, config::debugOverlay);
+            addToggle(right, top + ROW_GAP * 3, "Hide HUD", config::hideHud, config::hideHud);
+            addToggle(left, top + ROW_GAP * 4, "Exit on damage", config::exitOnDamage, config::exitOnDamage);
+            addToggle(right, top + ROW_GAP * 4, "Focus effects", config::focusEffects, config::focusEffects);
+            addToggle(left, top + ROW_GAP * 5, "Debug overlay", config::debugOverlay, config::debugOverlay);
         } else {
             addToggle(left, top, "Player shots", config::playerShots, config::playerShots);
             addToggle(right, top, "Armor/item details", config::playerDetailShots, config::playerDetailShots);

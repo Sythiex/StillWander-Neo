@@ -57,7 +57,7 @@ The original Fabric release is available from [upstream Still Wander 1.0.0](http
 
 1. Set up a Minecraft **1.21.1** client instance with **NeoForge**. NeoForge **21.1.250** is the tested version.
 2. Obtain the mod JAR using [GitHub Actions](#build-with-github-actions) or [Build locally](#build-locally) below.
-3. Copy `stillwander-neoforge-1.1.0-alpha.1+1.21.1.jar` into your instance's `mods/` folder.
+3. Copy `stillwander-neoforge-1.1.0-alpha.2+1.21.1.jar` into your instance's `mods/` folder.
 
 ## Controls
 
@@ -99,7 +99,7 @@ The manual [Build mod JAR workflow](.github/workflows/build-mod.yml) compiles th
 2. Select **Build mod JAR** in the workflow list.
 3. Click **Run workflow**, select the branch **1.21.1-Neoforge**, and click **Run workflow** again.
 4. Open the new run, select the **build** job, and expand **Run tests and build Still Wander** to view the build output. A successful run finishes with a green check and `BUILD SUCCESSFUL` in that step's log.
-5. Once **Upload installable mod JAR** succeeds, return to the run's summary page. Under **Artifacts**, click the mod JAR artifact, currently `stillwander-neoforge-1.1.0-alpha.1+1.21.1.jar`, to download it.
+5. Once **Upload installable mod JAR** succeeds, return to the run's summary page. Under **Artifacts**, click the mod JAR artifact, currently `stillwander-neoforge-1.1.0-alpha.2+1.21.1.jar`, to download it.
 
 Manual runs require `.github/workflows/build-mod.yml`, including its `workflow_dispatch` trigger, to be present on the repository's default branch. If **Run workflow** is missing, check that requirement and your write access. See [GitHub's manual workflow instructions](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow).
 

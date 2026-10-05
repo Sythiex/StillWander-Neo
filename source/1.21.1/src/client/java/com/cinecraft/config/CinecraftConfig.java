@@ -16,6 +16,7 @@ public final class CinecraftConfig {
     private static final Path PATH = FMLPaths.CONFIGDIR.get().resolve("stillwander.json");
     public static final CinecraftConfig INSTANCE = load();
 
+    private boolean autoStartCamera = true;
     private int idleSeconds = 25;
     private QualityPreset quality = QualityPreset.BALANCED;
     private double shotLengthMultiplier = 1.0;
@@ -63,6 +64,7 @@ public final class CinecraftConfig {
     }
 
     public void resetDefaults() {
+        autoStartCamera = true;
         idleSeconds = 25;
         quality = QualityPreset.BALANCED;
         shotLengthMultiplier = 1.0;
@@ -99,6 +101,8 @@ public final class CinecraftConfig {
         return Math.round(baseMillis * shotLengthMultiplier / cameraSpeed);
     }
 
+    public boolean autoStartCamera() { return autoStartCamera; }
+    public void autoStartCamera(boolean value) { autoStartCamera = value; }
     public int idleSeconds() { return idleSeconds; }
     public void idleSeconds(int value) { idleSeconds = value; }
     public QualityPreset quality() { return quality; }

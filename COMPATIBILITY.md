@@ -4,7 +4,9 @@ Tested on 2026-09-06 using NeoForge 21.1.250 and Java 21.0.5. These are developm
 
 ## Latest recorded verification
 
-The latest automated follow-up, on 2026-09-07, passed **56 tests** and `clean test build --no-daemon --console=plain` (all ten tasks executed). It fixes loaded-sightline traversal overshooting mixed-direction chunk-corner endpoints. The new regression failed before the fix and now covers both traversal directions, positive and negative boundaries, multi-chunk segments, and missing endpoint chunks. In-game smoke checks were not rerun for this fix.
+The latest automated follow-up, on 2026-10-04, passed **61 tests** and `clean test build --no-daemon --console=plain` (nine tasks executed, test compilation from cache). The persistent **Auto-start camera** option disables idle activation and its FPS request while preserving manual/capture eligibility. Five new headless tests cover defaults/persistence/reset, expired-idle eligibility, automatic-session cleanup before rendering release, preservation of manual/capture sessions, and countdown transitions. See [the build record](source/1.21.1/compat-evidence/auto-start-build.json). In-game menu layout, B/F8 controls, HUD restoration, and actual Dynamic FPS power-state checks were not rerun for this change and remain pending.
+
+The prior automated follow-up, on 2026-09-07, passed **56 tests** and `clean test build --no-daemon --console=plain` (all ten tasks executed). It fixes loaded-sightline traversal overshooting mixed-direction chunk-corner endpoints. The new regression failed before the fix and now covers both traversal directions, positive and negative boundaries, multi-chunk segments, and missing endpoint chunks. In-game smoke checks were not rerun for that fix.
 
 The latest combined automated and in-game passenger-camera run was completed on 2026-09-06:
 

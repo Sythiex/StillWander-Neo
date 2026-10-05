@@ -33,7 +33,7 @@ For upstream updates, compare changes against the baseline first, translate the 
 
 ## Build and validation
 
-The latest automated verification, on 2026-09-07 after the loaded-sightline corner-endpoint fix, passed **56 freshly executed tests** and the clean build gate. All ten Gradle tasks executed; Minecraft preparation intermediates were reused. The latest in-game passenger-camera run, on 2026-09-06, passed **14 standalone smoke checks** and **30 full-set smoke checks** alongside its earlier 54-test gate. In-game smoke checks were not rerun for the corner fix. See [the latest results and evidence](COMPATIBILITY.md#latest-recorded-verification).
+The latest automated verification, on 2026-10-04 after adding the persistent Auto-start camera setting, passed **61 tests** and the clean build gate. Nine Gradle tasks executed and test compilation came from cache; Minecraft preparation intermediates were reused. Five new tests cover config defaults/persistence/reset, automatic versus manual/capture eligibility, automatic-session cleanup before rendering release, and idle countdown transitions. The latest in-game passenger-camera run, on 2026-09-06, passed **14 standalone smoke checks** and **30 full-set smoke checks** alongside its earlier 54-test gate. In-game checks were not rerun for this setting; menu layout, key controls, and actual Dynamic FPS power-state verification remain pending for this change. See [the latest results and evidence](COMPATIBILITY.md#latest-recorded-verification).
 
 Artifact inspection checks NeoForge metadata, Java 21 bytecode, all five client mixins, the retained license, embedded Sable Companion, and exclusion of the Fabric metadata, ReplayMod writer, optional mod distributions, and development smoke fixtures. Regression coverage includes rendered hull candidate/raycast behavior, Dynamic FPS's resulting unfocused/iconified power state after shutdown, and the actual camera orientation with a player mounted in a Create seat on a rotated ship. Passenger regressions cover fixed landscape targets, compass-stable panoramas through ship turns/banks, carried fallbacks, loaded-view limits, and capture-preserving travel cuts.
 
@@ -47,7 +47,7 @@ From the repository root:
 
 On Linux/macOS use `./gradlew` with the same arguments. The installable artifact is:
 
-`source/1.21.1/build/libs/stillwander-neoforge-1.1.0-alpha.1+1.21.1.jar`
+`source/1.21.1/build/libs/stillwander-neoforge-1.1.0-alpha.2+1.21.1.jar`
 
 The `-sources.jar` is for development, not installation. `runClient` supports standalone and pinned compatibility profiles; see [COMPATIBILITY.md](COMPATIBILITY.md).
 
